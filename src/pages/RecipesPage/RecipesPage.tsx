@@ -67,7 +67,7 @@ const RecipesPage = () => {
       <div className="filter-container">
         <input
           type="text"
-          placeholder="Пошук рецепту..."
+          placeholder="Search..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="search-input"
