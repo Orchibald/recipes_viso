@@ -7,6 +7,7 @@ import { Recipe } from "../../types/Recipe";
 import Pagination from "../../components/Pagination/Pagination";
 import { FavBtn } from "../../components/FavBtn/FavBtn";
 import './RecipesPage.css';
+import Loader from "../../components/Loader/Loader";
 
 const ITEMS_PER_PAGE = 4;
 
@@ -59,7 +60,7 @@ const RecipesPage = () => {
     setSearch("");
   };
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <Loader />;
 
   return (
     <div className="container">
