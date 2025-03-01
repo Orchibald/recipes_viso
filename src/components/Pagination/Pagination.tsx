@@ -1,4 +1,4 @@
-import './Pagination.css'
+import './Pagination.css';
 
 interface PaginationProps {
   totalItems: number;
@@ -9,10 +9,29 @@ interface PaginationProps {
 
 const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: PaginationProps) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const visiblePages = totalPages > 3 ? [...Array(3)].map((_, i) => i + 1) : [...Array(totalPages)].map((_, i) => i + 1);
+
+  // Функція для визначення видимих сторінок
+  const getVisiblePages = (currentPage: number, totalPages: number) => {
+    if (totalPages <= 3) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    if (currentPage <= 2) {
+      return [1, 2, 3];
+    }
+
+    if (currentPage >= totalPages - 1) {
+      return [totalPages - 2, totalPages - 1, totalPages];
+    }
+
+    return [currentPage - 1, currentPage, currentPage + 1];
+  };
+
+  const visiblePages = getVisiblePages(currentPage, totalPages);
 
   return (
     <div className="pagination">
+      {/* Кнопка "Назад" */}
       <button 
         className="prev-button" 
         disabled={currentPage === 1} 
@@ -20,7 +39,21 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: Pag
       >
         ◀
       </button>
-      
+
+      {/* Якщо сторінок більше 3 і ми не на першій сторінці */}
+      {totalPages > 3 && currentPage > 2 && (
+        <>
+          <button 
+            className="page-button" 
+            onClick={() => onPageChange(1)}
+          >
+            1
+          </button>
+          {currentPage > 3 && <span className="dots">...</span>}
+        </>
+      )}
+
+      {/* Відображаємо основні видимі сторінки */}
       {visiblePages.map((page) => (
         <button 
           key={page} 
@@ -32,17 +65,20 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: Pag
         </button>
       ))}
 
-      {totalPages > 3 && <span className="dots">...</span>}
-      
-      {totalPages > 3 && (
-        <button 
-          className={`page-button ${currentPage === totalPages ? 'active' : ''}`} 
-          onClick={() => onPageChange(totalPages)}
-        >
-          {totalPages}
-        </button>
+      {/* Якщо сторінок більше 3 і ми не на останніх сторінках */}
+      {totalPages > 3 && currentPage < totalPages - 1 && (
+        <>
+          {currentPage < totalPages - 2 && <span className="dots">...</span>}
+          <button 
+            className="page-button" 
+            onClick={() => onPageChange(totalPages)}
+          >
+            {totalPages}
+          </button>
+        </>
       )}
-      
+
+      {/* Кнопка "Вперед" */}
       <button 
         className="next-button" 
         disabled={currentPage === totalPages} 
