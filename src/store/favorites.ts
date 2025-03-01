@@ -1,18 +1,9 @@
 import { create } from "zustand";
-
-interface FavoriteRecipe {
-  idMeal: string;
-  strMeal: string;
-  strMealThumb: string;
-  strCategory: string;
-  strArea: string;
-  strInstructions: string;
-  ingredients: string[];
-}
+import { Recipe } from "../types/Recipe";
 
 interface FavoritesState {
-  favorites: FavoriteRecipe[];
-  toggleFavorite: (recipe: FavoriteRecipe) => void;
+  favorites: Recipe[];
+  toggleFavorite: (recipe: Recipe) => void;
 }
 
 export const useFavoritesStore = create<FavoritesState>((set, get) => ({
@@ -23,7 +14,13 @@ export const useFavoritesStore = create<FavoritesState>((set, get) => ({
     set({
       favorites: isFavorite
         ? favorites.filter((fav) => fav.idMeal !== recipe.idMeal)
-        : [...favorites, recipe],
+        : [
+            ...favorites,
+            {
+              ...recipe,
+            },
+          ],
     });
   },
+  
 }));
