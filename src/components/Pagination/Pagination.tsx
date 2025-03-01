@@ -1,4 +1,4 @@
-import './Pagination.css'
+import './Pagination.css';
 
 interface PaginationProps {
   totalItems: number;
@@ -9,7 +9,26 @@ interface PaginationProps {
 
 const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: PaginationProps) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const visiblePages = totalPages > 3 ? [...Array(3)].map((_, i) => i + 1) : [...Array(totalPages)].map((_, i) => i + 1);
+
+  const getVisiblePages = (currentPage: number, totalPages: number) => {
+    const visiblePages = [];
+
+    if (totalPages <= 3) {
+      for (let i = 1; i <= totalPages; i++) {
+        visiblePages.push(i);
+      }
+    } else if (currentPage <= 2) {
+      visiblePages.push(1, 2, 3);
+    } else if (currentPage >= totalPages - 1) {
+      visiblePages.push(totalPages - 2, totalPages - 1, totalPages);
+    } else {
+      visiblePages.push(currentPage - 1, currentPage, currentPage + 1);
+    }
+
+    return visiblePages;
+  };
+
+  const visiblePages = getVisiblePages(currentPage, totalPages);
 
   return (
     <div className="pagination">
@@ -20,7 +39,19 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: Pag
       >
         ◀
       </button>
-      
+
+      {currentPage > 2 && (
+        <>
+          <button 
+            className="page-button" 
+            onClick={() => onPageChange(1)}
+          >
+            1
+          </button>
+          {currentPage > 3 && <span className="dots">...</span>}
+        </>
+      )}
+
       {visiblePages.map((page) => (
         <button 
           key={page} 
@@ -32,17 +63,18 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: Pag
         </button>
       ))}
 
-      {totalPages > 3 && <span className="dots">...</span>}
-      
-      {totalPages > 3 && (
-        <button 
-          className={`page-button ${currentPage === totalPages ? 'active' : ''}`} 
-          onClick={() => onPageChange(totalPages)}
-        >
-          {totalPages}
-        </button>
+      {currentPage < totalPages - 1 && (
+        <>
+          {currentPage < totalPages - 2 && <span className="dots">...</span>}
+          <button 
+            className="page-button" 
+            onClick={() => onPageChange(totalPages)}
+          >
+            {totalPages}
+          </button>
+        </>
       )}
-      
+
       <button 
         className="next-button" 
         disabled={currentPage === totalPages} 
