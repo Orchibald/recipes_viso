@@ -334,6 +334,7 @@
 
 .recipe-image-container {
   margin-bottom: 20px;
+  position: relative;
 }
 
 .recipe-image {

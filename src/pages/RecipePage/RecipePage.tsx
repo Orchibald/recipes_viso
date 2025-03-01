@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./RecipePage.css";
+import { useFavoritesStore } from "../../store/favorites";
+import { FavBtn } from "../../components/FavBtn/FavBtn";
 
 const fetchRecipe = async (id: string) => {
   const { data } = await axios.get(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
@@ -10,10 +12,12 @@ const fetchRecipe = async (id: string) => {
 
 const RecipePage = () => {
   const { id } = useParams();
-  const { data: recipe, isLoading, error } = useQuery({ 
-    queryKey: ["recipe", id], 
-    queryFn: () => fetchRecipe(id!) 
+  const { data: recipe, isLoading, error } = useQuery({
+    queryKey: ["recipe", id],
+    queryFn: () => fetchRecipe(id!)
   });
+
+  const { favorites, toggleFavorite } = useFavoritesStore();
 
   if (isLoading) return <div className="container loading">Loading recipe...</div>;
   if (error) return <div className="container error">Error loading recipe.</div>;
@@ -23,7 +27,7 @@ const RecipePage = () => {
   for (let i = 1; i <= 20; i++) {
     const ingredient = recipe[`strIngredient${i}`];
     const measure = recipe[`strMeasure${i}`];
-    
+
     if (ingredient && ingredient.trim() !== "") {
       ingredients.push({
         ingredient,
@@ -31,6 +35,8 @@ const RecipePage = () => {
       });
     }
   }
+
+  const isFavorite = favorites.some((fav) => fav.idMeal === recipe.idMeal);
 
   return (
     <div className="container recipe-details">
@@ -45,16 +51,21 @@ const RecipePage = () => {
 
       <div className="recipe-content">
         <div className="recipe-image-container">
-          <img 
-            src={recipe.strMealThumb} 
-            alt={recipe.strMeal} 
+          <FavBtn
+            onClick={toggleFavorite}
+            isFavorite={isFavorite}
+            meal={recipe}
+          />
+          <img
+            src={recipe.strMealThumb}
+            alt={recipe.strMeal}
             className="recipe-image"
           />
           {recipe.strYoutube && (
             <div className="video-link">
-              <a 
-                href={recipe.strYoutube} 
-                target="_blank" 
+              <a
+                href={recipe.strYoutube}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="youtube-button"
               >
@@ -89,9 +100,9 @@ const RecipePage = () => {
       {recipe.strSource && (
         <div className="recipe-source">
           <h3 className="source-title">Source</h3>
-          <a 
-            href={recipe.strSource} 
-            target="_blank" 
+          <a
+            href={recipe.strSource}
+            target="_blank"
             rel="noopener noreferrer"
             className="source-link"
           >
