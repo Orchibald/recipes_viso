@@ -54,3 +54,44 @@
   color: #666;
   padding-bottom: 10px;
 }
+
+.category-filter {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.category-select {
+  padding: 8px 15px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: border 0.3s ease, background-color 0.3s ease;
+}
+
+.category-select:hover,
+.category-select:focus {
+  background-color: #f0f0f0;
+}
+
+.reset-filters-btn {
+  padding: 8px 15px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.reset-filters-btn:hover {
+  background-color: #d32f2f;
+}
+
+.reset-filters-btn:focus {
+  outline: none;
+}
