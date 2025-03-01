@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import './CustomLink.css'
 
 interface CustomLinkProps {
   title: string,
@@ -10,7 +11,7 @@ export const CustomLink: React.FC<CustomLinkProps> = ({
   title
 }) => {
   return (
-    <Link to={route} className="fav-link">
+    <Link to={route} className="custom-link">
       {title}
     </Link>
   );

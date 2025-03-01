@@ -1,0 +1,17 @@
+
+.empty-msg {
+  text-align: center;
+  font-size: 20px;
+  color: #666;
+}
+
+.ingredients-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.ingredients-list li {
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+

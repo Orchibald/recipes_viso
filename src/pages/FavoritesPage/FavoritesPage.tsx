@@ -1,8 +1,10 @@
-import { useFavoritesStore } from "../store/favorites";
+import { useFavoritesStore } from "../../store/favorites";
 import { Link } from "react-router-dom";
+import { FavBtn } from "../../components/FavBtn/FavBtn";
+import './FavoritesPage.css'
 
 const FavoritesPage = () => {
-  const { favorites } = useFavoritesStore();
+  const { favorites, toggleFavorite } = useFavoritesStore();
 
   const getIngredients = (recipe: any) => {
     const ingredients = [];
@@ -33,15 +35,20 @@ const FavoritesPage = () => {
     <div className="container">
       <h1>Selected recipes</h1>
       <div className="recipe-list">
-        {favorites.map((meal) => (
-          <div key={meal.idMeal} className="recipe-card">
-            <Link to={`/recipe/${meal.idMeal}`} className="recipe-link">
-              <img src={meal.strMealThumb} alt={meal.strMeal} className="recipe-img" />
-              <h3 className="recipe-title">{meal.strMeal}</h3>
-              <p className="recipe-info">{meal.strCategory} - {meal.strArea}</p>
-            </Link>
-          </div>
-        ))}
+        {favorites.map((meal) => {
+          const isFavorite = true;
+          
+          return (
+            <div key={meal.idMeal} className="recipe-card">
+              <FavBtn onClick={toggleFavorite} meal={meal} isFavorite={isFavorite} />
+              <Link to={`/recipe/${meal.idMeal}`} className="recipe-link">
+                <img src={meal.strMealThumb} alt={meal.strMeal} className="recipe-img" />
+                <h3 className="recipe-title">{meal.strMeal}</h3>
+                <p className="recipe-info">{meal.strCategory} - {meal.strArea}</p>
+              </Link>
+            </div>
+          );
+        })}
       </div>
 
       <h2>List of ingredients</h2>

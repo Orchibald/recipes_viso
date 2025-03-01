@@ -54,6 +54,6 @@ export interface Recipe {
   dateModified: string | null;
 }
 
-export interface receiptData {
+export interface RecipeData {
   meals: Recipe[]
 }

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import Pagination from "../components/Pagination";
 import { Link } from "react-router-dom";
-import { useDebouncedValue } from "../hooks/useDebounceValue";
-import { useRecipes } from "../hooks/useRecipes";
-import { useFavoritesStore } from "../store/favorites";
-import { Recipe } from "../types/Recipe";
+import { useDebouncedValue } from "../../hooks/useDebounceValue";
+import { useRecipes } from "../../hooks/useRecipes";
+import { useFavoritesStore } from "../../store/favorites";
+import { Recipe } from "../../types/Recipe";
+import Pagination from "../../components/Pagination/Pagination";
+import { FavBtn } from "../../components/FavBtn/FavBtn";
+import './RecipesPage.css';
 
 const ITEMS_PER_PAGE = 4;
 
@@ -102,14 +104,7 @@ const RecipesPage = () => {
 
             return (
               <div key={meal.idMeal} className="recipe-card">
-                <button
-                  className={`favorite-btn ${isFavorite ? "active" : ""}`}
-                  onClick={() =>
-                    toggleFavorite(meal)
-                  }
-                >
-                  ❤️
-                </button>
+                <FavBtn onClick={toggleFavorite} meal={meal} isFavorite={isFavorite} />
                 <Link to={`/recipe/${meal.idMeal}`} className="recipe-link">
                   <img src={meal.strMealThumb} alt={meal.strMeal} className="recipe-img" />
                   <h3 className="recipe-title">{meal.strMeal}</h3>

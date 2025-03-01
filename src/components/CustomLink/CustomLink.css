@@ -1,0 +1,14 @@
+.custom-link {
+  text-decoration: none;
+  margin-right: 5px;
+  color: white;
+  background-color: blue;
+  padding: 5px;
+  border-radius: 10px;
+  transition: background-color .3s ease;
+}
+
+.custom-link:hover {
+  cursor: pointer;
+  background-color: rgb(34, 34, 175);
+}
