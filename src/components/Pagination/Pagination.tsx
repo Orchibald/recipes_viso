@@ -10,7 +10,6 @@ interface PaginationProps {
 const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: PaginationProps) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  // Функція для визначення видимих сторінок
   const getVisiblePages = (currentPage: number, totalPages: number) => {
     if (totalPages <= 3) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -31,7 +30,6 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: Pag
 
   return (
     <div className="pagination">
-      {/* Кнопка "Назад" */}
       <button 
         className="prev-button" 
         disabled={currentPage === 1} 
@@ -40,7 +38,6 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: Pag
         ◀
       </button>
 
-      {/* Якщо сторінок більше 3 і ми не на першій сторінці */}
       {totalPages > 3 && currentPage > 2 && (
         <>
           <button 
@@ -53,7 +50,6 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: Pag
         </>
       )}
 
-      {/* Відображаємо основні видимі сторінки */}
       {visiblePages.map((page) => (
         <button 
           key={page} 
@@ -65,7 +61,6 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: Pag
         </button>
       ))}
 
-      {/* Якщо сторінок більше 3 і ми не на останніх сторінках */}
       {totalPages > 3 && currentPage < totalPages - 1 && (
         <>
           {currentPage < totalPages - 2 && <span className="dots">...</span>}
@@ -78,7 +73,6 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }: Pag
         </>
       )}
 
-      {/* Кнопка "Вперед" */}
       <button 
         className="next-button" 
         disabled={currentPage === totalPages} 
