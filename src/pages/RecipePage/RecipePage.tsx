@@ -4,6 +4,7 @@ import axios from "axios";
 import "./RecipePage.css";
 import { useFavoritesStore } from "../../store/favorites";
 import { FavBtn } from "../../components/FavBtn/FavBtn";
+import Loader from "../../components/Loader/Loader";
 
 const fetchRecipe = async (id: string) => {
   const { data } = await axios.get(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
@@ -19,7 +20,7 @@ const RecipePage = () => {
 
   const { favorites, toggleFavorite } = useFavoritesStore();
 
-  if (isLoading) return <div className="container loading">Loading recipe...</div>;
+  if (isLoading) return <div className="container loading"><Loader /></div>;
   if (error) return <div className="container error">Error loading recipe.</div>;
   if (!recipe) return <div className="container not-found">Recipe not found.</div>;
 
