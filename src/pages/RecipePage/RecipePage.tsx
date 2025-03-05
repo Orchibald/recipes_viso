@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useFavoritesStore } from "../../store/favorites";
 import { FavBtn } from "../../components/FavBtn/FavBtn";
@@ -5,31 +6,33 @@ import Loader from "../../components/Loader/Loader";
 import { useRecipe } from "../../hooks/useRecipe";
 import "./RecipePage.css";
 
-
-
 const RecipePage = () => {
   const { id } = useParams();
   const { data: recipe, isLoading, error } = useRecipe(id);
   const { favorites, toggleFavorite } = useFavoritesStore();
 
+  const ingredients = useMemo(() => {
+    if (!recipe) return [];
+    const list = [];
+    for (let i = 1; i <= 20; i++) {
+      const ingredient = recipe[`strIngredient${i}`];
+      const measure = recipe[`strMeasure${i}`];
+
+      if (ingredient && ingredient.trim() !== "") {
+        list.push({ ingredient, measure: measure || "" });
+      }
+    }
+    return list;
+  }, [recipe]);
+
+  const isFavorite = useMemo(
+    () => recipe && favorites.some((fav) => fav.idMeal === recipe.idMeal),
+    [favorites, recipe]
+  );
+
   if (isLoading) return <div className="container loading"><Loader /></div>;
   if (error) return <div className="container error">Error loading recipe.</div>;
   if (!recipe) return <div className="container not-found">Recipe not found.</div>;
-
-  const ingredients = [];
-  for (let i = 1; i <= 20; i++) {
-    const ingredient = recipe[`strIngredient${i}`];
-    const measure = recipe[`strMeasure${i}`];
-
-    if (ingredient && ingredient.trim() !== "") {
-      ingredients.push({
-        ingredient,
-        measure: measure || ""
-      });
-    }
-  }
-
-  const isFavorite = favorites.some((fav) => fav.idMeal === recipe.idMeal);
 
   return (
     <div className="container recipe-details">
@@ -44,24 +47,11 @@ const RecipePage = () => {
 
       <div className="recipe-content">
         <div className="recipe-image-container">
-          <FavBtn
-            onClick={toggleFavorite}
-            isFavorite={isFavorite}
-            meal={recipe}
-          />
-          <img
-            src={recipe.strMealThumb}
-            alt={recipe.strMeal}
-            className="recipe-image"
-          />
+          <FavBtn onClick={toggleFavorite} isFavorite={isFavorite} meal={recipe} />
+          <img src={recipe.strMealThumb} alt={recipe.strMeal} className="recipe-image" />
           {recipe.strYoutube && (
             <div className="video-link">
-              <a
-                href={recipe.strYoutube}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="youtube-button"
-              >
+              <a href={recipe.strYoutube} target="_blank" rel="noopener noreferrer" className="youtube-button">
                 Watch Video Tutorial
               </a>
             </div>
@@ -93,12 +83,7 @@ const RecipePage = () => {
       {recipe.strSource && (
         <div className="recipe-source">
           <h3 className="source-title">Source</h3>
-          <a
-            href={recipe.strSource}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="source-link"
-          >
+          <a href={recipe.strSource} target="_blank" rel="noopener noreferrer" className="source-link">
             {recipe.strSource}
           </a>
         </div>

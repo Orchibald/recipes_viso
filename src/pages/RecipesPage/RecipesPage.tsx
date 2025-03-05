@@ -118,8 +118,8 @@ const RecipesPage = () => {
       <Pagination
         totalItems={filteredRecipes.length}
         itemsPerPage={ITEMS_PER_PAGE}
-        currentPage={currentPage}
         onPageChange={setCurrentPage}
+        currentPage={currentPage}
       />
     </div>
   );
