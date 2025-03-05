@@ -1,22 +1,31 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDebouncedValue } from "../../hooks/useDebounceValue";
 import { useRecipes } from "../../hooks/useRecipes";
 import { useFavoritesStore } from "../../store/favorites";
 import Pagination from "../../components/Pagination/Pagination";
 import { FavBtn } from "../../components/FavBtn/FavBtn";
-import "./RecipesPage.css";
 import Loader from "../../components/Loader/Loader";
+import "./RecipesPage.css";
 
 const ITEMS_PER_PAGE = 4;
 
 const RecipesPage = () => {
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [categories, setCategories] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const { search } = useLocation();
+  const navigate = useNavigate(); // useNavigate замість useHistory
 
-  const debouncedSearch = useDebouncedValue(search, 500);
+  // Витягування параметрів з URL
+  const urlParams = new URLSearchParams(search);
+  const initialSearch = urlParams.get("search") || "";
+  const initialCategory = urlParams.get("category") || "";
+  const initialPage = Number(urlParams.get("page")) || 1;
+
+  const [searchValue, setSearch] = useState(initialSearch);
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [categories, setCategories] = useState<string[]>([]);
+
+  const debouncedSearch = useDebouncedValue(searchValue, 500);
   const { data: recipes, isLoading } = useRecipes(debouncedSearch);
   const { favorites, toggleFavorite } = useFavoritesStore();
 
@@ -27,10 +36,15 @@ const RecipesPage = () => {
     }
   }, [recipes]);
 
+  // Оновлення URL при зміні параметрів
   useEffect(() => {
-    setSelectedCategory("");
-    setCurrentPage(1);
-  }, [debouncedSearch])
+    const params = new URLSearchParams();
+    if (searchValue) params.set("search", searchValue);
+    if (selectedCategory) params.set("category", selectedCategory);
+    if (currentPage > 1) params.set("page", currentPage.toString());
+
+    navigate({ search: params.toString() }); // використовуємо navigate для оновлення URL
+  }, [searchValue, selectedCategory, currentPage, navigate]);
 
   const filteredRecipes = selectedCategory
     ? recipes?.filter((recipe) => recipe.strCategory === selectedCategory) ?? []
@@ -57,7 +71,7 @@ const RecipesPage = () => {
         <input
           type="text"
           placeholder="Search..."
-          value={search}
+          value={searchValue}
           onChange={(e) => setSearch(e.target.value)}
           className="search-input"
         />
@@ -72,7 +86,7 @@ const RecipesPage = () => {
             ))}
           </select>
 
-          {(search || selectedCategory) && (
+          {(searchValue || selectedCategory) && (
             <button onClick={handleResetFilters} className="reset-filters-btn">
               Reset filters
             </button>
