@@ -1,12 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDebouncedValue } from "../../hooks/useDebounceValue";
 import { useRecipes } from "../../hooks/useRecipes";
 import { useFavoritesStore } from "../../store/favorites";
-import { Recipe } from "../../types/Recipe";
 import Pagination from "../../components/Pagination/Pagination";
 import { FavBtn } from "../../components/FavBtn/FavBtn";
-import './RecipesPage.css';
+import "./RecipesPage.css";
 import Loader from "../../components/Loader/Loader";
 
 const ITEMS_PER_PAGE = 4;
@@ -14,41 +13,31 @@ const ITEMS_PER_PAGE = 4;
 const RecipesPage = () => {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [renderedRecipes, setRenderedRecipes] = useState<Recipe[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
-  const debouncedSearch = useDebouncedValue(search, 500);
-  const { data: recipes, isLoading } = useRecipes(debouncedSearch);
-
-  const { favorites, toggleFavorite } = useFavoritesStore();
   const [currentPage, setCurrentPage] = useState(1);
 
+  const debouncedSearch = useDebouncedValue(search, 500);
+  const { data: recipes, isLoading } = useRecipes(debouncedSearch);
+  const { favorites, toggleFavorite } = useFavoritesStore();
+
   useEffect(() => {
     if (recipes) {
-      const uniqueCategories = Array.from(
-        new Set(recipes.map((recipe) => recipe.strCategory))
-      ).sort();
+      const uniqueCategories = Array.from(new Set(recipes.map((recipe) => recipe.strCategory))).sort();
       setCategories(uniqueCategories);
     }
-  }, [recipes, currentPage]);
+  }, [recipes]);
 
   useEffect(() => {
-    if (recipes) {
-      let filteredRecipes = recipes;
+    setSelectedCategory("");
+    setCurrentPage(1);
+  }, [debouncedSearch])
 
-      if (selectedCategory) {
-        filteredRecipes = filteredRecipes.filter(
-          (recipe) => recipe.strCategory === selectedCategory
-        );
-      }
+  const filteredRecipes = selectedCategory
+    ? recipes?.filter((recipe) => recipe.strCategory === selectedCategory) ?? []
+    : recipes ?? [];
 
-      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-      const paginatedRecipes = filteredRecipes.slice(
-        startIndex,
-        startIndex + ITEMS_PER_PAGE
-      );
-      setRenderedRecipes(paginatedRecipes);
-    }
-  }, [recipes, selectedCategory, currentPage]);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const renderedRecipes = filteredRecipes.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategory(e.target.value);
@@ -74,11 +63,7 @@ const RecipesPage = () => {
         />
 
         <div className="category-filter">
-          <select
-            value={selectedCategory}
-            onChange={handleCategoryChange}
-            className="category-select"
-          >
+          <select value={selectedCategory} onChange={handleCategoryChange} className="category-select">
             <option value="">All categories</option>
             {categories.map((category) => (
               <option key={category} value={category}>
@@ -88,17 +73,14 @@ const RecipesPage = () => {
           </select>
 
           {(search || selectedCategory) && (
-            <button
-              onClick={handleResetFilters}
-              className="reset-filters-btn"
-            >
+            <button onClick={handleResetFilters} className="reset-filters-btn">
               Reset filters
             </button>
           )}
         </div>
       </div>
 
-      {renderedRecipes && renderedRecipes.length > 0 ? (
+      {renderedRecipes.length > 0 ? (
         <div className="recipe-list">
           {renderedRecipes.map((meal) => {
             const isFavorite = favorites.some((fav) => fav.idMeal === meal.idMeal);
@@ -120,9 +102,7 @@ const RecipesPage = () => {
       )}
 
       <Pagination
-        totalItems={(recipes && selectedCategory)
-          ? recipes.filter(r => r.strCategory === selectedCategory).length
-          : recipes?.length ?? 0}
+        totalItems={filteredRecipes.length}
         itemsPerPage={ITEMS_PER_PAGE}
         currentPage={currentPage}
         onPageChange={setCurrentPage}

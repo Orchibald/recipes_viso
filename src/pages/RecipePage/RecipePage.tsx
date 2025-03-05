@@ -1,23 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import "./RecipePage.css";
 import { useFavoritesStore } from "../../store/favorites";
 import { FavBtn } from "../../components/FavBtn/FavBtn";
 import Loader from "../../components/Loader/Loader";
+import { useRecipe } from "../../hooks/useRecipe";
+import "./RecipePage.css";
 
-const fetchRecipe = async (id: string) => {
-  const { data } = await axios.get(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
-  return data.meals[0];
-};
+
 
 const RecipePage = () => {
   const { id } = useParams();
-  const { data: recipe, isLoading, error } = useQuery({
-    queryKey: ["recipe", id],
-    queryFn: () => fetchRecipe(id!)
-  });
-
+  const { data: recipe, isLoading, error } = useRecipe(id);
   const { favorites, toggleFavorite } = useFavoritesStore();
 
   if (isLoading) return <div className="container loading"><Loader /></div>;
