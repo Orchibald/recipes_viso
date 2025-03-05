@@ -1,33 +1,39 @@
+import { useMemo } from "react";
 import { useFavoritesStore } from "../../store/favorites";
 import { Link } from "react-router-dom";
 import { FavBtn } from "../../components/FavBtn/FavBtn";
-import './FavoritesPage.css'
+import "./FavoritesPage.css";
 
 const FavoritesPage = () => {
   const { favorites, toggleFavorite } = useFavoritesStore();
 
   const getIngredients = (recipe: any) => {
-    const ingredients = [];
-    for (let i = 1; i <= 20; i++) {
-      const ingredient = recipe[`strIngredient${i}`];
-      const measure = recipe[`strMeasure${i}`];
+    const ingredients: string[] = [];
 
-      if (ingredient && ingredient.trim() !== "") {
-        ingredients.push(`${measure} ${ingredient}`);
+    Object.keys(recipe).forEach((key) => {
+      if (key.startsWith("strIngredient") && recipe[key]?.trim()) {
+        const index = key.replace("strIngredient", "");
+        const measure = recipe[`strMeasure${index}`] || "";
+        ingredients.push(`${measure} ${recipe[key]}`.trim());
       }
-    }
+    });
+
     return ingredients;
   };
 
-  const allIngredients = favorites.reduce((acc, recipe) => {
-    const ingredients = getIngredients(recipe);
-    if (ingredients.length > 0) {
-      return [...acc, ...ingredients];
-    }
-    return acc;
-  }, [] as string[]);
+  const uniqueIngredients = useMemo(() => {
+    const ingredientCounts = favorites.reduce((acc, recipe) => {
+      const ingredients = getIngredients(recipe);
+      ingredients.forEach((ingredient) => {
+        acc[ingredient] = (acc[ingredient] || 0) + 1;
+      });
+      return acc;
+    }, {} as Record<string, number>);
 
-  const uniqueIngredients = [...new Set(allIngredients)];
+    return Object.entries(ingredientCounts).map(
+      ([ingredient, count]) => `${ingredient} x${count}`
+    );
+  }, [favorites]);
 
   if (favorites.length === 0) return <p className="empty-msg">Favorites list is empty 😢</p>;
 
@@ -37,7 +43,6 @@ const FavoritesPage = () => {
       <div className="recipe-list">
         {favorites.map((meal) => {
           const isFavorite = true;
-          
           return (
             <div key={meal.idMeal} className="recipe-card">
               <FavBtn onClick={toggleFavorite} meal={meal} isFavorite={isFavorite} />
@@ -59,7 +64,7 @@ const FavoritesPage = () => {
           ))}
         </ul>
       ) : (
-        <p>Ingradients aren`t available</p>
+        <p>Ingredients aren’t available</p>
       )}
     </div>
   );
